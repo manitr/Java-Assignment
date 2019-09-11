@@ -1,83 +1,99 @@
 import java.util.HashMap;
+import java.util.Scanner;
 
-public class TransactionHandler {
+public class TransactionHandler{
+    private HashMap<String , Integer> database = new HashMap<String , Integer>();
+    int selectOption;
 
-    HashMap<String , Integer> database = new HashMap<String , Integer>();
+    TransactionHandler(int option){
+        selectOption = option;
+    }
 
     synchronized int incrementBy(String key, int value) {
         System.out.println(Thread.currentThread().getName() + database);
-        int temp = value;
+        int sum = value;
         if (database.containsKey(key)) {
-            temp += database.get(key);
-            database.put(key, temp);
+            sum += database.get(key);
+            database.put(key, sum);
         } else {
-            database.put(key, temp);
+            database.put(key, sum);
         }
         return database.get(key);
     }
 
     public static void main(String[] args) {
-        TransactionHandler trans = new TransactionHandler();
-        RequestHandler1 rh1 = new RequestHandler1(trans);
-        RequestHandler2 rh2 = new RequestHandler2(trans);
-        RequestHandler3 rh3 = new RequestHandler3(trans);
+        Scanner s = new Scanner(System.in);
+        System.out.println("Enter option: 1, 2 or 3");
+        int option = s.nextInt();
+        try {
+            if(option < 1 || option > 3){
+                throw new InvalidOptionException();
+            }
+        } catch (InvalidOptionException e){
+            while (option < 1 || option > 3) {
+                System.out.println(e.toString());
+                System.out.println("Please enter a valid option");
+                option = s.nextInt();
+            }
+        }
+        TransactionHandler handler = new TransactionHandler(option);
+        RequestHandler reqHandler = new RequestHandler(handler);
         //delay
         int a = 1, MOD = 999999999;
         for(int i = 0; i < 999999999; i++){
             a = a%MOD;
         }
-        System.out.println("database " + trans.database);
+        //final database state
+        System.out.println("database " + handler.database);
     }
 }
 
-class RequestHandler1 implements Runnable{
+class RequestHandler implements Runnable{
     TransactionHandler Store;
-    Thread t;
-    RequestHandler1(TransactionHandler store) {
+    Thread thread;
+    RequestHandler(TransactionHandler store) {
         Store = store;
-        t = new Thread(this);
-        t.start();
+        thread = new Thread(this);
+        thread.start();
     }
     @Override
     public void run() {
-        Store.incrementBy("shubham", 5);
-        Store.incrementBy("manit", 13);
-        Store.incrementBy("karan", 21);
-        Store.incrementBy("shubham", 2);
+        switch (Store.selectOption){
+            case 1: {
+                Store.incrementBy("shubham", 5);
+                Store.incrementBy("manit", 13);
+                Store.incrementBy("karan", 21);
+                Store.incrementBy("shubham", 2);
+                break;
+            }
+            case 2: {
+                Store.incrementBy("nitish", 13);
+                Store.incrementBy("manit", 24);
+                Store.incrementBy("harsh", 2);
+                Store.incrementBy("noor", 6);
+                Store.incrementBy("karan", 15);
+                break;
+            }
+            case 3: {
+                Store.incrementBy("shubham", 9);
+                Store.incrementBy("noor", 18);
+                Store.incrementBy("nitish", 5);
+                Store.incrementBy("harsh", 16);
+                break;
+            }
+            default: {
+                System.out.println("Invalid option");
+                break;
+            }
+        }
     }
 }
 
-class RequestHandler2 implements Runnable{
-    TransactionHandler Store;
-    Thread t;
-    RequestHandler2(TransactionHandler store) {
-        Store = store;
-        t = new Thread(this);
-        t.start();
-    }
-    @Override
-    public void run() {
-        Store.incrementBy("nitish", 13);
-        Store.incrementBy("manit", 24);
-        Store.incrementBy("harsh", 2);
-        Store.incrementBy("noor", 6);
-        Store.incrementBy("karan", 15);
-    }
-}
+class InvalidOptionException extends Exception {
+    final String message = "Option should be one of 1, 2 or 3";
 
-class RequestHandler3 implements Runnable{
-    TransactionHandler Store;
-    Thread t;
-    RequestHandler3(TransactionHandler store) {
-        Store = store;
-        t = new Thread(this);
-        t.start();
-    }
     @Override
-    public void run() {
-        Store.incrementBy("shubham", 9);
-        Store.incrementBy("noor", 18);
-        Store.incrementBy("nitish", 5);
-        Store.incrementBy("harsh", 16);
+    public String toString() {
+        return "Invalid option Exception: "  + message;
     }
 }
