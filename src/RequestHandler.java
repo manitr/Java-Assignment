@@ -1,36 +1,46 @@
-import Exceptions.InvalidHeightException;
-import Exceptions.UserNotFoundException;
-import TransactionHandlers.TransactionHandler1;
-import TransactionHandlers.TransactionHandler2;
+import Exceptions.*;
+import TransactionHandlers.UserBalanceHandler;
+import TransactionHandlers.MaxHeightUserHandler;
 import javax.naming.OperationNotSupportedException;
 
 public class RequestHandler implements Runnable {
-    TransactionHandler1 dataStore1;
-    TransactionHandler2 dataStore2;
+    UserBalanceHandler dataStore1;
+    MaxHeightUserHandler dataStore2;
     Thread thread;
-    int option;
+    private int option;
 
-    RequestHandler(TransactionHandler1 store) {
+    RequestHandler(UserBalanceHandler store) {
         dataStore1 = store;
-        option = 1;
+        option = getOption();
         thread = new Thread(this);
         thread.start();
     }
 
-    RequestHandler(TransactionHandler2 store) {
+    RequestHandler(MaxHeightUserHandler store) {
         dataStore2 = store;
-        option = 2;
+        option = getOption();
         thread = new Thread(this);
         thread.start();
     }
 
-    RequestHandler(TransactionHandler1 store1, TransactionHandler2 store2) {
+    RequestHandler(UserBalanceHandler store1, MaxHeightUserHandler store2) {
         dataStore1 = store1;
         dataStore2 = store2;
-        option = 3;
+        option = getOption();
         thread = new Thread(this);
         thread.start();
     }
+
+    private int getOption() {
+        if(this.dataStore1 != null && this.dataStore2 == null) {
+            return 1;
+        }
+        else if(this.dataStore1 == null && this.dataStore2 != null) {
+            return 2;
+        }
+        return 3;
+    }
+
     @Override
     public void run() {
         switch (option) {
@@ -39,7 +49,7 @@ public class RequestHandler implements Runnable {
                     dataStore1.put("shubham", 5);
                     dataStore1.incrementBy("shubham", 5);
                     dataStore1.incrementBy("manit", 13);
-                    dataStore1.incrementBy("manit", 2);
+                    System.out.println(dataStore1.decrementBy("manit", 2));
                     System.out.println(dataStore1.delete("shubham"));
                     System.out.println(dataStore1.get("shubham"));
                     dataStore1.get("karan");
@@ -47,12 +57,21 @@ public class RequestHandler implements Runnable {
                 catch (UserNotFoundException e) {
                     e.printStackTrace();
                 }
+                catch (IllegalIncrementValueException e) {
+                    e.printStackTrace();
+                }
+                catch (IllegalDecrementValueException e) {
+                    e.printStackTrace();
+                }
+                catch (NegativeInitialBalanceException e) {
+                    e.printStackTrace();
+                }
                 break;
             case 2:
                 try {
                     dataStore2.put("Rohit");
                     System.out.println(dataStore2.getTallestUser());
-                    dataStore2.put("Manit", 179);
+                    dataStore2.put(new String(), 179);
                     System.out.println(dataStore2.getTallestUser());
                     dataStore2.put("Sahil", 178);
                     dataStore2.put("Yash", 181);
@@ -65,11 +84,14 @@ public class RequestHandler implements Runnable {
                 catch (OperationNotSupportedException e) {
                     e.printStackTrace();
                 }
+                catch (EmptyNameFieldException e) {
+                    e.printStackTrace();
+                }
                 break;
             case 3:
                 try {
                     dataStore1.put("Karan", 5);
-                    dataStore1.incrementBy("Karan", 5);
+                    dataStore1.decrementBy("Karan", 1);
                     dataStore1.incrementBy("Nitish", 13);
                     dataStore2.put("Rohit");
                     System.out.println(dataStore2.getTallestUser());
@@ -81,15 +103,38 @@ public class RequestHandler implements Runnable {
                 catch (InvalidHeightException e) {
                     e.printStackTrace();
                 }
+                catch (EmptyNameFieldException e) {
+                    e.printStackTrace();
+                }
+                catch (IllegalDecrementValueException e) {
+                    e.printStackTrace();
+                }
+                catch (IllegalIncrementValueException e) {
+                    e.printStackTrace();
+                }
+                catch (UserNotFoundException e) {
+                    e.printStackTrace();
+                }
+                catch (NegativeInitialBalanceException e) {
+                    e.printStackTrace();
+                }
                 break;
+            default: {
+                try {
+                    throw new OperationNotSupportedException();
+                }
+                catch (OperationNotSupportedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     public static void main(String[] args) {
-        TransactionHandler1 handler1 = new TransactionHandler1("HashMap");
-        TransactionHandler2  handler2 = new TransactionHandler2();
-        TransactionHandler1 handler3 = new TransactionHandler1("HashMap");
-        TransactionHandler2  handler4 = new TransactionHandler2();
+        UserBalanceHandler handler1 = new UserBalanceHandler("HashMap");
+        MaxHeightUserHandler handler2 = new MaxHeightUserHandler();
+        UserBalanceHandler handler3 = new UserBalanceHandler("HashMap");
+        MaxHeightUserHandler handler4 = new MaxHeightUserHandler();
         RequestHandler req1 = new RequestHandler(handler1);
         RequestHandler req2 = new RequestHandler(handler2);
         RequestHandler req3 = new RequestHandler(handler3, handler4);
