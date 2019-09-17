@@ -8,6 +8,6 @@ Steps to run:
 3. Clone the repository or Download zip and extract it.
 4. Compile and execute the file on Command Prompt using command:
 
-    i. javac RequestHandler.java
+    i.  javac RequestHandler.java
     
     ii. java RequestHandler.java   
