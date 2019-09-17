@@ -1,14 +1,14 @@
 package TransactionHandlers;
 
 import Databases.Database;
-import Exceptions.IllegalDecrementValueException;
-import Exceptions.IllegalIncrementValueException;
-import Exceptions.NegativeInitialBalanceException;
-import Exceptions.UserNotFoundException;
+import Exceptions.*;
+
+import javax.naming.InsufficientResourcesException;
 import java.util.HashMap;
 
 public class UserBalanceHandler extends Database<String, Integer> {
     HashMap<String, Integer> userData;
+    static final int INITIAL_BALANCE = 0;
 
     public UserBalanceHandler(String collectionName) {
         userData = (HashMap<String, Integer>) getDatabase(collectionName);
@@ -21,21 +21,26 @@ public class UserBalanceHandler extends Database<String, Integer> {
         return userData.get(key);
     }
 
-    @Override
-    public synchronized boolean put(String key) throws NegativeInitialBalanceException {
-        return put(key, 0);
+    public synchronized boolean put(String key) throws NegativeInitialBalanceException, EmptyNameFieldException, IllegalParametersListException {
+        return put(key, INITIAL_BALANCE);
     }
 
     @Override
-    public synchronized boolean put(String key, Integer value) throws NegativeInitialBalanceException {
+    public synchronized boolean put(String key, Integer ... value) throws NegativeInitialBalanceException, EmptyNameFieldException, IllegalParametersListException {
+        if(key.isEmpty()) {
+            throw new EmptyNameFieldException();
+        }
+        if(value.length != 1) {
+            throw new IllegalParametersListException();
+        }
         if(userData.containsKey(key)) {
             return false;
         }
 
-        if(value < 0) {
+        if(value[0] < 0) {
             throw new NegativeInitialBalanceException();
         }
-        userData.put(key, value);
+        userData.put(key, value[0]);
         return true;
     }
 
@@ -47,18 +52,18 @@ public class UserBalanceHandler extends Database<String, Integer> {
         int credit = value;
         if (userData.containsKey(key)) {
             credit += userData.get(key);
-            userData.put(key, credit);
-            return credit;
         }
         userData.put(key, credit);
-        return userData.get(key);
+        return credit;
     }
 
-    public synchronized int decrementBy(String key, int value) throws IllegalDecrementValueException, UserNotFoundException {
+    public synchronized int decrementBy(String key, int value) throws IllegalDecrementValueException, UserNotFoundException, InsufficientBalanceException {
         System.out.println(Thread.currentThread().getName() + userData);
-
         if(value < 0) {
             throw new IllegalDecrementValueException();
+        }
+        if(value > userData.get(key)) {
+            throw new InsufficientBalanceException();
         }
         if (!userData.containsKey(key)) {
             throw new UserNotFoundException();
