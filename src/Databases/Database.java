@@ -15,7 +15,7 @@ public abstract class Database<K,V> {
     protected abstract Object get(K key) throws UserNotFoundException, OperationNotSupportedException;
 
     protected Object getDatabase(String collectionName) {
-        switch (collectionName){
+        switch (collectionName) {
             case "HashMap": return new HashMap<K,V>();
 
             case "HashSet": return new HashSet<K>();
