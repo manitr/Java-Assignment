@@ -2,38 +2,31 @@ package TransactionHandlers;
 
 import Databases.Database;
 import Exceptions.EmptyNameFieldException;
+import Exceptions.IllegalParametersListException;
 import Exceptions.InvalidHeightException;
 import javax.naming.OperationNotSupportedException;
 
 public class MaxHeightUserHandler extends Database<String, Integer> {
-    static final int DEFAULT_HEIGHT = 5;
     int userHeight;
     String userName;
     @Override
-    public synchronized boolean put(String key, Integer value) throws InvalidHeightException, EmptyNameFieldException {
+    public synchronized boolean put(String key, Integer ... value) throws InvalidHeightException, EmptyNameFieldException, IllegalParametersListException {
         if(key.isEmpty()) {
             throw new EmptyNameFieldException();
         }
-        if(value < 0) {
+        if(value[0] < 0) {
             throw new InvalidHeightException();
         }
-        if(userName != null) {
-            if(userHeight < value) {
-                userName = key;
-                userHeight = value;
-            }
+        if(value.length != 1) {
+            throw new IllegalParametersListException();
         }
-        else {
+        if(userHeight < value[0]) {
             userName = key;
-            userHeight = value;
+            userHeight = value[0];
         }
         return true;
     }
 
-    @Override
-    public synchronized boolean put(String key) throws InvalidHeightException, EmptyNameFieldException {
-        return put(key, DEFAULT_HEIGHT);
-    }
 
     @Override
     public String get(String key) throws OperationNotSupportedException {
