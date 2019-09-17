@@ -1,16 +1,12 @@
 package Databases;
 
-import Exceptions.EmptyNameFieldException;
-import Exceptions.InvalidHeightException;
-import Exceptions.NegativeInitialBalanceException;
-import Exceptions.UserNotFoundException;
+import Exceptions.*;
+
 import javax.naming.OperationNotSupportedException;
 import java.util.*;
 
 public abstract class Database<K,V> {
-    protected abstract boolean put(K key) throws InvalidHeightException, EmptyNameFieldException, NegativeInitialBalanceException;
-
-    protected abstract boolean put(K key, V value) throws InvalidHeightException, EmptyNameFieldException, NegativeInitialBalanceException;
+    protected abstract boolean put(K key, V ... value) throws InvalidHeightException, EmptyNameFieldException, NegativeInitialBalanceException, IllegalParametersListException;
 
     protected abstract Object get(K key) throws UserNotFoundException, OperationNotSupportedException;
 
@@ -32,5 +28,3 @@ public abstract class Database<K,V> {
         return null;
     }
 }
-
-
