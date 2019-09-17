@@ -52,7 +52,7 @@ public class RequestHandler implements Runnable {
                     System.out.println(dataStore1.decrementBy("manit", 2));
                     System.out.println(dataStore1.delete("shubham"));
                     System.out.println(dataStore1.get("shubham"));
-                    dataStore1.get("karan");
+//                    dataStore1.get("karan");
                 }
                 catch (UserNotFoundException e) {
                     e.printStackTrace();
@@ -71,9 +71,9 @@ public class RequestHandler implements Runnable {
                 try {
                     dataStore2.put("Rohit");
                     System.out.println(dataStore2.getTallestUser());
-                    dataStore2.put(new String(), 179);
+                    dataStore2.put(new String("kunal"), 179);
                     System.out.println(dataStore2.getTallestUser());
-                    dataStore2.put("Sahil", 178);
+                    dataStore2.put("Sahil", Integer.valueOf("178"));
                     dataStore2.put("Yash", 181);
                     System.out.println(dataStore2.getTallestUser());
                     dataStore2.get("Sahil");
@@ -92,7 +92,7 @@ public class RequestHandler implements Runnable {
                 try {
                     dataStore1.put("Karan", 5);
                     dataStore1.decrementBy("Karan", 1);
-                    dataStore1.incrementBy("Nitish", 13);
+                    dataStore1.incrementBy("Nitish", -13);
                     dataStore2.put("Rohit");
                     System.out.println(dataStore2.getTallestUser());
                     dataStore2.put("Yash", 181);
