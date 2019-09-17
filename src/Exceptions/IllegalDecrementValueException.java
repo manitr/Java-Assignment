@@ -5,7 +5,7 @@ public class IllegalDecrementValueException extends Throwable {
 
     @Override
     public String toString() {
-        return "IllegalIncrementValueException: "  + message;
+        return "IllegalDecrementValueException: "  + message;
     }
 }
 
