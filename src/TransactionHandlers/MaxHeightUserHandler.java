@@ -11,7 +11,7 @@ public class MaxHeightUserHandler extends Database<String, Integer> {
     String userName;
     @Override
     public synchronized boolean put(String key, Integer value) throws InvalidHeightException, EmptyNameFieldException {
-        if(key.isEmpty()){
+        if(key.isEmpty()) {
             throw new EmptyNameFieldException();
         }
         if(value < 0) {
